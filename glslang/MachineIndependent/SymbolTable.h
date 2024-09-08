@@ -203,7 +203,7 @@ protected:
     TType type;
     bool userType;
 
-    // we are assuming that Pool Allocator will free the memory allocated to unionArray
+    // we are assuming that PoolsHandles Allocator will free the memory allocated to unionArray
     // when this object is destroyed
 
     TConstUnionArray constArray;               // for compile-time constant value
@@ -344,7 +344,7 @@ protected:
     bool defined;
     bool prototyped;
     bool implicitThis;         // True if this function is allowed to see all members of 'this'
-    bool illegalImplicitThis;  // True if this function is not supposed to have access to dynamic members of 'this',
+    bool illegalImplicitThis;  // True if this function is not supposed to have src_access to dynamic members of 'this',
                                // even if it finds member variables in the symbol table.
                                // This is important for a static member function that has member variables in scope,
                                // but is not allowed to use them, or see hidden symbols instead.
@@ -598,7 +598,7 @@ protected:
     TVector<std::pair<TString, TString>> retargetedSymbols;
     int anonId;
     bool thisLevel;  // True if this level of the symbol table is a structure scope containing member function
-                     // that are supposed to see anonymous access to member variables.
+                     // that are supposed to see anonymous src_access to member variables.
 };
 
 class TSymbolTable {

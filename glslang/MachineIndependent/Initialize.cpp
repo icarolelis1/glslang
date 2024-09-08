@@ -6586,7 +6586,7 @@ void TBuiltIns::addQueryFunctions(TSampler sampler, const TString& typeName, int
 // Helper function for add2ndGenerationSamplingImaging(),
 // when adding context-independent built-in functions.
 //
-// Add all the image access functions for the given type.
+// Add all the image src_access functions for the given type.
 //
 void TBuiltIns::addImageFunctions(TSampler sampler, const TString& typeName, int version, EProfile profile)
 {
@@ -6816,7 +6816,7 @@ void TBuiltIns::addImageFunctions(TSampler sampler, const TString& typeName, int
 // Helper function for initialize(),
 // when adding context-independent built-in functions.
 //
-// Add all the subpass access functions for the given type.
+// Add all the subpass src_access functions for the given type.
 //
 void TBuiltIns::addSubpassSampling(TSampler sampler, const TString& typeName, int /*version*/, EProfile /*profile*/)
 {
@@ -8506,7 +8506,7 @@ void TBuiltIns::identifyBuiltIns(int version, EProfile profile, const SpvVersion
         // E_GL_ARB_shader_image_load_store
         if (profile != EEsProfile && version < 420)
             symbolTable.setFunctionExtensions("memoryBarrier", 1, &E_GL_ARB_shader_image_load_store);
-        // All the image access functions are protected by checks on the type of the first argument.
+        // All the image src_access functions are protected by checks on the type of the first argument.
 
         // E_GL_ARB_shader_atomic_counters
         if (profile != EEsProfile && version < 420) {

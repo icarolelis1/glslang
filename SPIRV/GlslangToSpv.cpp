@@ -277,7 +277,7 @@ protected:
     // Map pointee types for EbtReference to their forward pointers
     std::map<const glslang::TType *, spv::Id> forwardPointers;
     // Type forcing, for when SPIR-V wants a different type than the AST,
-    // requiring local translation to and from SPIR-V type on every access.
+    // requiring local translation to and from SPIR-V type on every src_access.
     // Maps <builtin-variable-id -> AST-required-type-id>
     std::unordered_map<spv::Id, spv::Id> forceType;
     // Used by Task shader while generating opearnds for OpEmitMeshTasksEXT
@@ -2029,7 +2029,7 @@ void TGlslangToSpvTraverser::dumpSpv(std::vector<unsigned int>& out)
 // Symbols can turn into
 //  - uniform/input reads
 //  - output writes
-//  - complex lvalue base setups:  foo.bar[3]....  , where we see foo and start up an access chain
+//  - complex lvalue base setups:  foo.bar[3]....  , where we see foo and start up an src_access chain
 //  - something simple that degenerates into the last bullet
 //
 void TGlslangToSpvTraverser::visitSymbol(glslang::TIntermSymbol* symbol)
@@ -2088,10 +2088,10 @@ void TGlslangToSpvTraverser::visitSymbol(glslang::TIntermSymbol* symbol)
 
     // Only process non-linkage-only nodes for generating actual static uses
     if (! linkageOnly || symbol->getQualifier().isSpecConstant()) {
-        // Prepare to generate code for the access
+        // Prepare to generate code for the src_access
 
         // L-value chains will be computed left to right.  We're on the symbol now,
-        // which is the left-most part of the access chain, so now is "clear" time,
+        // which is the left-most part of the src_access chain, so now is "clear" time,
         // followed by setting the base.
         builder.clearAccessChain();
 
@@ -2226,7 +2226,7 @@ bool TGlslangToSpvTraverser::visitBinary(glslang::TVisit /* visit */, glslang::T
     case glslang::EOpIndexDirectStruct:
         {
             // Structure, array, matrix, or vector indirection with statically known index.
-            // Get the left part of the access chain.
+            // Get the left part of the src_access chain.
             node->getLeft()->traverse(this);
 
             // Add the next element in the chain
@@ -2235,11 +2235,11 @@ bool TGlslangToSpvTraverser::visitBinary(glslang::TVisit /* visit */, glslang::T
             if (! node->getLeft()->getType().isArray() &&
                 node->getLeft()->getType().isVector() &&
                 node->getOp() == glslang::EOpIndexDirect) {
-                // Swizzle is uniform so propagate uniform into access chain
+                // Swizzle is uniform so propagate uniform into src_access chain
                 spv::Builder::AccessChain::CoherentFlags coherentFlags = TranslateCoherent(node->getLeft()->getType());
                 coherentFlags.nonUniform = 0;
                 // This is essentially a hard-coded vector swizzle of size 1,
-                // so short circuit the access-chain stuff with a swizzle.
+                // so short circuit the src_access-chain stuff with a swizzle.
                 std::vector<unsigned> swizzle;
                 swizzle.push_back(glslangIndex);
                 int dummySize;
@@ -2251,7 +2251,7 @@ bool TGlslangToSpvTraverser::visitBinary(glslang::TVisit /* visit */, glslang::T
 
                 // Load through a block reference is performed with a dot operator that
                 // is mapped to EOpIndexDirectStruct. When we get to the actual reference,
-                // do a load and reset the access chain.
+                // do a load and reset the src_access chain.
                 if (node->getLeft()->isReference() &&
                     !node->getLeft()->getType().isArray() &&
                     node->getOp() == glslang::EOpIndexDirectStruct)
@@ -2295,12 +2295,12 @@ bool TGlslangToSpvTraverser::visitBinary(glslang::TVisit /* visit */, glslang::T
     case glslang::EOpIndexIndirect:
         {
             // Array, matrix, or vector indirection with variable index.
-            // Will use native SPIR-V access-chain for and array indirection;
+            // Will use native SPIR-V src_access-chain for and array indirection;
             // matrices are arrays of vectors, so will also work for a matrix.
-            // Will use the access chain's 'component' for variable index into a vector.
+            // Will use the src_access chain's 'component' for variable index into a vector.
 
-            // This adapter is building access chains left to right.
-            // Set up the access chain to the left.
+            // This adapter is building src_access chains left to right.
+            // Set up the src_access chain to the left.
             node->getLeft()->traverse(this);
 
             // save it so that computing the right side doesn't trash it
@@ -2313,10 +2313,10 @@ bool TGlslangToSpvTraverser::visitBinary(glslang::TVisit /* visit */, glslang::T
 
             addIndirectionIndexCapabilities(node->getLeft()->getType(), node->getRight()->getType());
 
-            // restore the saved access chain
+            // restore the saved src_access chain
             builder.setAccessChain(partial);
 
-            // Only if index is nonUniform should we propagate nonUniform into access chain
+            // Only if index is nonUniform should we propagate nonUniform into src_access chain
             spv::Builder::AccessChain::CoherentFlags index_flags = TranslateCoherent(node->getRight()->getType());
             spv::Builder::AccessChain::CoherentFlags coherent_flags = TranslateCoherent(node->getLeft()->getType());
             coherent_flags.nonUniform = index_flags.nonUniform;
@@ -2940,7 +2940,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
     case glslang::EOpComma:
     {
         // processing from left to right naturally leaves the right-most
-        // lying around in the access chain
+        // lying around in the src_access chain
         glslang::TIntermSequence& glslangOperands = node->getSequence();
         for (int i = 0; i < (int)glslangOperands.size(); ++i)
             glslangOperands[i]->traverse(this);
@@ -3582,7 +3582,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
             node->getOp() == glslang::EOpCooperativeMatrixStoreNV) {
 
             if (arg == 1) {
-                // fold "element" parameter into the access chain
+                // fold "element" parameter into the src_access chain
                 spv::Builder::AccessChain save = builder.getAccessChain();
                 builder.clearAccessChain();
                 glslangOperands[2]->traverse(this);
@@ -3631,7 +3631,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
         if (lvalue) {
             if (invertedType == spv::NoType && !builder.isSpvLvalue()) {
                 // SPIR-V cannot represent an l-value containing a swizzle that doesn't
-                // reduce to a simple access chain.  So, we need a temporary vector to
+                // reduce to a simple src_access chain.  So, we need a temporary vector to
                 // receive the result, and must later swizzle that into the original
                 // l-value.
                 complexLvalues.push_back(builder.getAccessChain());
@@ -3886,7 +3886,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
 // GLSL only has r-values as the result of a :?, but
 // if we have an l-value, that can be more efficient if it will
 // become the base of a complex r-value expression, because the
-// next layer copies r-values into memory to use the access-chain mechanism
+// next layer copies r-values into memory to use the src_access-chain mechanism
 bool TGlslangToSpvTraverser::visitSelection(glslang::TVisit /* visit */, glslang::TIntermSelection* node)
 {
     // see if OpSelect can handle it
@@ -10300,7 +10300,7 @@ int GetSpirvGeneratorVersion()
     // return 1; // start
     // return 2; // EOpAtomicCounterDecrement gets a post decrement, to map between GLSL -> SPIR-V
     // return 3; // change/correct barrier-instruction operands, to match memory model group decisions
-    // return 4; // some deeper access chains: for dynamic vector component, and local Boolean component
+    // return 4; // some deeper src_access chains: for dynamic vector component, and local Boolean component
     // return 5; // make OpArrayLength result type be an int with signedness of 0
     // return 6; // revert version 5 change, which makes a different (new) kind of incorrect code,
                  // versions 4 and 6 each generate OpArrayLength as it has long been done

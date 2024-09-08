@@ -249,7 +249,7 @@ void Builder::postProcess(Instruction& inst)
             Instruction *accessChain = module.getInstruction(inst.getIdOperand(0));
             if (accessChain->getOpCode() == OpAccessChain) {
                 Instruction *base = module.getInstruction(accessChain->getIdOperand(0));
-                // Get the type of the base of the access chain. It must be a pointer type.
+                // Get the type of the base of the src_access chain. It must be a pointer type.
                 Id typeId = base->getTypeId();
                 Instruction *type = module.getInstruction(typeId);
                 assert(type->getOpCode() == OpTypePointer);
@@ -259,7 +259,7 @@ void Builder::postProcess(Instruction& inst)
                 // Get the pointee type.
                 typeId = type->getIdOperand(1);
                 type = module.getInstruction(typeId);
-                // Walk the index list for the access chain. For each index, find any
+                // Walk the index list for the src_access chain. For each index, find any
                 // misalignment that can apply when accessing the member/element via
                 // Offset/ArrayStride/MatrixStride decorations, and bitwise OR them all
                 // together.

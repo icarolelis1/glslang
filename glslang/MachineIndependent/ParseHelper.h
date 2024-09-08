@@ -520,7 +520,7 @@ protected:
 
 public:
     //
-    // Generally, bison productions, the scanner, and the PP need read/write access to these; just give them direct access
+    // Generally, bison productions, the scanner, and the PP need read/write src_access to these; just give them direct src_access
     //
 
     // Current state of parsing

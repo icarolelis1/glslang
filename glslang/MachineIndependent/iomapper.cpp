@@ -1343,7 +1343,7 @@ s - for samplers
    SAMPLERSTATE
    SAMPLERCOMPARISONSTATE
 
-u - for unordered access views (UAV)
+u - for unordered src_access views (UAV)
    RWBYTEADDRESSBUFFER
    RWSTRUCTUREDBUFFER
    APPENDSTRUCTUREDBUFFER

@@ -1396,7 +1396,7 @@ Id Builder::getContainedTypeId(Id typeId, int member) const
     }
 }
 
-// Figure out the final resulting type of the access chain.
+// Figure out the final resulting type of the src_access chain.
 Id Builder::getResultingAccessChainType() const
 {
     assert(accessChain.base != NoResult);
@@ -3822,7 +3822,7 @@ void Builder::accessChainPushSwizzle(std::vector<unsigned>& swizzle, Id preSwizz
     if (accessChain.preSwizzleBaseType == NoType)
         accessChain.preSwizzleBaseType = preSwizzleBaseType;
 
-    // if needed, propagate the swizzle for the current access chain
+    // if needed, propagate the swizzle for the current src_access chain
     if (accessChain.swizzle.size() > 0) {
         std::vector<unsigned> oldSwizzle = accessChain.swizzle;
         accessChain.swizzle.resize(0);
@@ -3906,7 +3906,7 @@ Id Builder::accessChainLoad(Decoration precision, Decoration l_nonUniform,
     Id id;
 
     if (accessChain.isRValue) {
-        // transfer access chain, but try to stay in registers
+        // transfer src_access chain, but try to stay in registers
         transferAccessChainSwizzle(false);
         if (accessChain.indexChain.size() > 0) {
             Id swizzleBase = accessChain.preSwizzleBaseType != NoType ? accessChain.preSwizzleBaseType : resultType;
@@ -3945,7 +3945,7 @@ Id Builder::accessChainLoad(Decoration precision, Decoration l_nonUniform,
                 accessChain.base = lValue;
                 accessChain.isRValue = false;
 
-                // load through the access chain
+                // load through the src_access chain
                 id = createLoad(collapseAccessChain(), precision);
             }
         } else
@@ -3959,10 +3959,10 @@ Id Builder::accessChainLoad(Decoration precision, Decoration l_nonUniform,
             memoryAccess = (spv::MemoryAccessMask)(memoryAccess | spv::MemoryAccessAlignedMask);
         }
 
-        // load through the access chain
+        // load through the src_access chain
         id = collapseAccessChain();
-        // Apply nonuniform both to the access chain and the loaded value.
-        // Buffer accesses need the access chain decorated, and this is where
+        // Apply nonuniform both to the src_access chain and the loaded value.
+        // Buffer accesses need the src_access chain decorated, and this is where
         // loaded image types get decorated. TODO: This should maybe move to
         // createImageTextureFunctionCall.
         addDecoration(id, l_nonUniform);
@@ -4098,7 +4098,7 @@ void Builder::dump(std::vector<unsigned int>& out) const
 // Protected methods.
 //
 
-// Turn the described access chain in 'accessChain' into an instruction(s)
+// Turn the described src_access chain in 'accessChain' into an instruction(s)
 // computing its address.  This *cannot* include complex swizzles, which must
 // be handled after this is called.
 //
@@ -4107,12 +4107,12 @@ Id Builder::collapseAccessChain()
 {
     assert(accessChain.isRValue == false);
 
-    // did we already emit an access chain for this?
+    // did we already emit an src_access chain for this?
     if (accessChain.instr != NoResult)
         return accessChain.instr;
 
     // If we have a dynamic component, we can still transfer
-    // that into a final operand to the access chain.  We need to remap the
+    // that into a final operand to the src_access chain.  We need to remap the
     // dynamic component through the swizzle to get a new dynamic component to
     // update.
     //
@@ -4120,18 +4120,18 @@ Id Builder::collapseAccessChain()
     // generate code.
     remapDynamicSwizzle();
     if (accessChain.component != NoResult) {
-        // transfer the dynamic component to the access chain
+        // transfer the dynamic component to the src_access chain
         accessChain.indexChain.push_back(accessChain.component);
         accessChain.component = NoResult;
     }
 
     // note that non-trivial swizzling is left pending
 
-    // do we have an access chain?
+    // do we have an src_access chain?
     if (accessChain.indexChain.size() == 0)
         return accessChain.base;
 
-    // emit the access chain
+    // emit the src_access chain
     StorageClass storageClass = (StorageClass)module.getStorageClass(getTypeId(accessChain.base));
     accessChain.instr = createAccessChain(storageClass, accessChain.base, accessChain.indexChain);
 
@@ -4186,7 +4186,7 @@ void Builder::simplifyAccessChainSwizzle()
 // If 'dynamic' is true, include transferring the dynamic component,
 // otherwise, leave it pending.
 //
-// Does not generate code. just updates the access chain.
+// Does not generate code. just updates the src_access chain.
 void Builder::transferAccessChainSwizzle(bool dynamic)
 {
     // non existent?

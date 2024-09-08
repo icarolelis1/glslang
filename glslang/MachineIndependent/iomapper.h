@@ -219,7 +219,7 @@ protected:
         return isTextureType(type) || type.getQualifier().storage == EvqBuffer;
     }
 
-    // Return true if this is a UAV (unordered access view) type:
+    // Return true if this is a UAV (unordered src_access view) type:
     static bool isUavType(const glslang::TType& type) {
         if (type.getQualifier().isReadOnly())
             return false;

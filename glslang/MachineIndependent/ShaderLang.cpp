@@ -78,7 +78,7 @@
 namespace { // anonymous namespace for file-local functions and symbols
 
 // Total number of successful initializers of glslang: a refcount
-// Shared global; access should be protected by a global mutex/critical section.
+// Shared global; src_access should be protected by a global mutex/critical section.
 int NumberOfClients = 0;
 
 // global initialization lock
@@ -1818,7 +1818,7 @@ void TShader::setShiftImageBinding(unsigned int base)   { setShiftBinding(EResIm
 void TShader::setShiftUboBinding(unsigned int base)     { setShiftBinding(EResUbo, base); }
 // Synonym for setShiftUboBinding, to match HLSL language.
 void TShader::setShiftCbufferBinding(unsigned int base) { setShiftBinding(EResUbo, base); }
-// Set binding base for UAV (unordered access view)
+// Set binding base for UAV (unordered src_access view)
 void TShader::setShiftUavBinding(unsigned int base)     { setShiftBinding(EResUav, base); }
 // Set binding base for SSBOs
 void TShader::setShiftSsboBinding(unsigned int base)    { setShiftBinding(EResSsbo, base); }

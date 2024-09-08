@@ -2404,7 +2404,7 @@ TIntermSelection* TIntermediate::addSelection(TIntermTyped* cond, TIntermNodePai
 {
     //
     // Don't prune the false path for compile-time constants; it's needed
-    // for static access analysis.
+    // for static src_access analysis.
     //
 
     TIntermSelection* node = new TIntermSelection(cond, nodePair.node1, nodePair.node2);

@@ -629,7 +629,7 @@ public:
     }
     bool bufferReferenceNeedsVulkanMemoryModel() const
     {
-        // include qualifiers that map to load/store availability/visibility/nonprivate memory access operands
+        // include qualifiers that map to load/store availability/visibility/nonprivate memory src_access operands
         return subgroupcoherent || workgroupcoherent || queuefamilycoherent || devicecoherent || coherent || nonprivate;
     }
     bool isInterpolation() const

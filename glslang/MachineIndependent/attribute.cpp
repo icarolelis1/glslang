@@ -41,7 +41,7 @@
 namespace glslang {
 
 // extract integers out of attribute arguments stored in attribute aggregate
-bool TAttributeArgs::getInt(int& value, int argNum) const 
+bool TAttributeArgs::getInt(int& value, int argNum) const
 {
     const TConstUnion* intConst = getConstUnion(EbtInt, argNum);
 
@@ -55,7 +55,7 @@ bool TAttributeArgs::getInt(int& value, int argNum) const
 
 // extract strings out of attribute arguments stored in attribute aggregate.
 // convert to lower case if converToLower is true (for case-insensitive compare convenience)
-bool TAttributeArgs::getString(TString& value, int argNum, bool convertToLower) const 
+bool TAttributeArgs::getString(TString& value, int argNum, bool convertToLower) const
 {
     const TConstUnion* stringConst = getConstUnion(EbtString, argNum);
 
@@ -179,15 +179,15 @@ void TParseContext::handleSelectionAttributes(const TAttributes& attributes, TIn
         }
 
         switch (it->name) {
-        case EatFlatten:
-            selection->setFlatten();
-            break;
-        case EatBranch:
-            selection->setDontFlatten();
-            break;
-        default:
-            warn(node->getLoc(), "attribute does not apply to a selection", "", "");
-            break;
+            case EatFlatten:
+                selection->setFlatten();
+                break;
+            case EatBranch:
+                selection->setDontFlatten();
+                break;
+            default:
+                warn(node->getLoc(), "attribute does not apply to a selection", "", "");
+                break;
         }
     }
 }
@@ -208,15 +208,15 @@ void TParseContext::handleSwitchAttributes(const TAttributes& attributes, TInter
         }
 
         switch (it->name) {
-        case EatFlatten:
-            selection->setFlatten();
-            break;
-        case EatBranch:
-            selection->setDontFlatten();
-            break;
-        default:
-            warn(node->getLoc(), "attribute does not apply to a switch", "", "");
-            break;
+            case EatFlatten:
+                selection->setFlatten();
+                break;
+            case EatBranch:
+                selection->setDontFlatten();
+                break;
+            default:
+                warn(node->getLoc(), "attribute does not apply to a switch", "", "");
+                break;
         }
     }
 }
@@ -297,50 +297,50 @@ void TParseContext::handleLoopAttributes(const TAttributes& attributes, TIntermN
         int value = 0;
         unsigned uiValue = 0;
         switch (it->name) {
-        case EatUnroll:
-            if (noArgument("unroll"))
-                loop->setUnroll();
-            break;
-        case EatLoop:
-            if (noArgument("dont_unroll"))
-                loop->setDontUnroll();
-            break;
-        case EatDependencyInfinite:
-            if (noArgument("dependency_infinite"))
-                loop->setLoopDependency(TIntermLoop::dependencyInfinite);
-            break;
-        case EatDependencyLength:
-            if (positiveSignedArgument("dependency_length", value))
-                loop->setLoopDependency(value);
-            break;
-        case EatMinIterations:
-            spirv14("min_iterations");
-            if (unsignedArgument("min_iterations", uiValue))
-                loop->setMinIterations(uiValue);
-            break;
-        case EatMaxIterations:
-            spirv14("max_iterations");
-            if (unsignedArgument("max_iterations", uiValue))
-                loop->setMaxIterations(uiValue);
-            break;
-        case EatIterationMultiple:
-            spirv14("iteration_multiple");
-            if (positiveUnsignedArgument("iteration_multiple", uiValue))
-                loop->setIterationMultiple(uiValue);
-            break;
-        case EatPeelCount:
-            spirv14("peel_count");
-            if (unsignedArgument("peel_count", uiValue))
-                loop->setPeelCount(uiValue);
-            break;
-        case EatPartialCount:
-            spirv14("partial_count");
-            if (unsignedArgument("partial_count", uiValue))
-                loop->setPartialCount(uiValue);
-            break;
-        default:
-            warn(node->getLoc(), "attribute does not apply to a loop", "", "");
-            break;
+            case EatUnroll:
+                if (noArgument("unroll"))
+                    loop->setUnroll();
+                break;
+            case EatLoop:
+                if (noArgument("dont_unroll"))
+                    loop->setDontUnroll();
+                break;
+            case EatDependencyInfinite:
+                if (noArgument("dependency_infinite"))
+                    loop->setLoopDependency(TIntermLoop::dependencyInfinite);
+                break;
+            case EatDependencyLength:
+                if (positiveSignedArgument("dependency_length", value))
+                    loop->setLoopDependency(value);
+                break;
+            case EatMinIterations:
+                spirv14("min_iterations");
+                if (unsignedArgument("min_iterations", uiValue))
+                    loop->setMinIterations(uiValue);
+                break;
+            case EatMaxIterations:
+                spirv14("max_iterations");
+                if (unsignedArgument("max_iterations", uiValue))
+                    loop->setMaxIterations(uiValue);
+                break;
+            case EatIterationMultiple:
+                spirv14("iteration_multiple");
+                if (positiveUnsignedArgument("iteration_multiple", uiValue))
+                    loop->setIterationMultiple(uiValue);
+                break;
+            case EatPeelCount:
+                spirv14("peel_count");
+                if (unsignedArgument("peel_count", uiValue))
+                    loop->setPeelCount(uiValue);
+                break;
+            case EatPartialCount:
+                spirv14("partial_count");
+                if (unsignedArgument("partial_count", uiValue))
+                    loop->setPartialCount(uiValue);
+                break;
+            default:
+                warn(node->getLoc(), "attribute does not apply to a loop", "", "");
+                break;
         }
     }
 }
@@ -358,17 +358,17 @@ void TParseContext::handleFunctionAttributes(const TSourceLoc& loc, const TAttri
         }
 
         switch (it->name) {
-        case EatSubgroupUniformControlFlow:
-            requireExtensions(loc, 1, &E_GL_EXT_subgroup_uniform_control_flow, "attribute");
-            intermediate.setSubgroupUniformControlFlow();
-            break;
-        case EatMaximallyReconverges:
-            requireExtensions(loc, 1, &E_GL_EXT_maximal_reconvergence, "attribute");
-            intermediate.setMaximallyReconverges();
-            break;
-        default:
-            warn(loc, "attribute does not apply to a function", "", "");
-            break;
+            case EatSubgroupUniformControlFlow:
+                requireExtensions(loc, 1, &E_GL_EXT_subgroup_uniform_control_flow, "attribute");
+                intermediate.setSubgroupUniformControlFlow();
+                break;
+            case EatMaximallyReconverges:
+                requireExtensions(loc, 1, &E_GL_EXT_maximal_reconvergence, "attribute");
+                intermediate.setMaximallyReconverges();
+                break;
+            default:
+                warn(loc, "attribute does not apply to a function", "", "");
+                break;
         }
     }
 }

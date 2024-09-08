@@ -539,7 +539,7 @@ public:
         }
     }
 
-    // Add a uniform dereference where blocks/struct/arrays are involved in the access.
+    // Add a uniform dereference where blocks/struct/arrays are involved in the src_access.
     // Handles the situation where the left node is at the correct or too coarse a
     // granularity for reflection.  (That is, further dereferences up the tree will be
     // skipped.) Earlier dereferences, down the tree, will be handled

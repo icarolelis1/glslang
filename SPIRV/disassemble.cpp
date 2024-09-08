@@ -554,7 +554,7 @@ void SpirvStream::disassembleInstruction(Id resultId, Id /*typeId*/, Op opCode, 
         case OperandMemoryAccess:
             outputMask(OperandMemoryAccess, stream[word++]);
             --numOperands;
-            // Aligned is the only memory access operand that uses an immediate
+            // Aligned is the only memory src_access operand that uses an immediate
             // value, and it is also the first operand that uses a value at all.
             if (stream[word-1] & MemoryAccessAlignedMask) {
                 disassembleImmediates(1);

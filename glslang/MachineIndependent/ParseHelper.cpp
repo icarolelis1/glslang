@@ -2664,7 +2664,7 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
                         if (type->getType().getQualifier().storage == EvqVaryingIn) {
                             isIn = true;
                         }
-                        // If a field accessor was used, it can only be used to access a field with an input block, not a struct.
+                        // If a field accessor was used, it can only be used to src_access a field with an input block, not a struct.
                         if (structAccessOp && (type->getType().getBasicType() != EbtBlock)) {
                             interpolantErrorMsg +=
                                 ". Using the field of a named struct as an interpolant argument is not "

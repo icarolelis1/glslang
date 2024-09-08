@@ -112,7 +112,7 @@ std::string to_string(const T& val) {
 namespace glslang {
 
     //
-    // Pool version of string.
+    // PoolsHandles version of string.
     //
     typedef pool_allocator<char> TStringAllocator;
     typedef std::basic_string <char, std::char_traits<char>, TStringAllocator> TString;
@@ -165,7 +165,7 @@ inline bool StartsWith(TString const &str, const char *prefix)
 }
 
 //
-// Pool allocator versions of vectors, lists, and maps
+// PoolsHandles allocator versions of vectors, lists, and maps
 //
 template <class T> class TVector : public std::vector<T, pool_allocator<T> > {
 public:

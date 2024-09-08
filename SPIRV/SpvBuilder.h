@@ -678,7 +678,7 @@ public:
     //
     // Access chain design for an R-Value vs. L-Value:
     //
-    // There is a single access chain the builder is building at
+    // There is a single src_access chain the builder is building at
     // any particular time.  Such a chain can be used to either to a load or
     // a store, when desired.
     //
@@ -695,20 +695,20 @@ public:
     // no code is generated until the l-value is later dereferenced.  It is okay
     // to speculatively generate an l-value, just not okay to speculatively dereference it.
     //
-    // The base of the access chain (the left-most variable or expression
+    // The base of the src_access chain (the left-most variable or expression
     // from which everything is based) can be set either as an l-value
     // or as an r-value.  Most efficient would be to set an l-value if one
     // is available.  If an expression was evaluated, the resulting r-value
     // can be set as the chain base.
     //
-    // The users of this single access chain can save and restore if they
+    // The users of this single src_access chain can save and restore if they
     // want to nest or manage multiple chains.
     //
 
     struct AccessChain {
         Id base;                       // for l-values, pointer to the base object, for r-values, the base object
         std::vector<Id> indexChain;
-        Id instr;                      // cache the instruction that generates this access chain
+        Id instr;                      // cache the instruction that generates this src_access chain
         std::vector<unsigned> swizzle; // each std::vector element selects the next GLSL component number
         Id component;                  // a dynamic component index, can coexist with a swizzle,
                                        // done after the swizzle, NoResult if not present
@@ -807,7 +807,7 @@ public:
     void accessChainPushSwizzle(std::vector<unsigned>& swizzle, Id preSwizzleBaseType,
         AccessChain::CoherentFlags coherentFlags, unsigned int alignment);
 
-    // push a dynamic component selection onto the access chain, only applicable with a
+    // push a dynamic component selection onto the src_access chain, only applicable with a
     // non-trivial swizzle or no swizzle
     void accessChainPushComponent(Id component, Id preSwizzleBaseType, AccessChain::CoherentFlags coherentFlags,
         unsigned int alignment)
@@ -831,7 +831,7 @@ public:
         spv::MemoryAccessMask memoryAccess = spv::MemoryAccessMaskNone, spv::Scope scope = spv::ScopeMax,
             unsigned int alignment = 0);
 
-    // Return whether or not the access chain can be represented in SPIR-V
+    // Return whether or not the src_access chain can be represented in SPIR-V
     // as an l-value.
     // E.g., a[3].yx cannot be, while a[3].y and a[3].y[x] can be.
     bool isSpvLvalue() const { return accessChain.swizzle.size() <= 1; }
@@ -839,7 +839,7 @@ public:
     // get the direct pointer for an l-value
     Id accessChainGetLValue();
 
-    // Get the inferred SPIR-V type of the result of the current access chain,
+    // Get the inferred SPIR-V type of the result of the current src_access chain,
     // based on the type of the base and the chain of dereferences.
     Id accessChainGetInferredType();
 

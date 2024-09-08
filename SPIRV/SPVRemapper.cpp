@@ -873,7 +873,7 @@ namespace spv {
         idset_t fnLocalVars; // set of function local vars
         idmap_t idMap;       // Map of load result IDs to what they load
 
-        // EXPERIMENTAL: Forward input and access chain loads into consumptions
+        // EXPERIMENTAL: Forward input and src_access chain loads into consumptions
         process(
             [&](spv::Op opCode, unsigned start) {
                 // Add inputs and uniforms to the map
@@ -942,7 +942,7 @@ namespace spv {
         blockmap_t blockMap;     // Map of IDs to blocks they first appear in
         int        blockNum = 0; // block count, to avoid crossing flow control
 
-        // Find all the function local pointers stored at most once, and not via access chains
+        // Find all the function local pointers stored at most once, and not via src_access chains
         process(
             [&](spv::Op opCode, unsigned start) {
                 const int wordCount = asWordCount(start);
@@ -957,7 +957,7 @@ namespace spv {
                     return true;
                 }
 
-                // Ignore process vars referenced via access chain
+                // Ignore process vars referenced via src_access chain
                 if ((opCode == spv::OpAccessChain || opCode == spv::OpInBoundsAccessChain) && fnLocalVars.count(asId(start+3)) > 0) {
                     fnLocalVars.erase(asId(start+3));
                     idMap.erase(asId(start+3));
